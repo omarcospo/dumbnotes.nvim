@@ -16,9 +16,9 @@ notes.
 
 Add the following to your `init.lua`
 ```lua
-use {
-  'omarcospo/dumbnotes.nvim',
-  requires = { {'nvim-telescope/telescope.nvim'} }
+{
+  "omarcospo/dumbnotes.nvim",
+  dependencies = "nvim-telescope/telescope.nvim",
 }
 ```
 
