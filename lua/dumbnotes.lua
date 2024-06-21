@@ -4,6 +4,7 @@ local opts = {}
 dumbnotes.config = {
   notes_format = "md",
   notes_path = "~/Notes",
+  find_recursively = false,
   mappings = {
     new_note_key = "<C-n>",
     delete_note_key = "<C-d>",
@@ -86,7 +87,14 @@ function dumbnotes.list_notes(opts)
   require("telescope.builtin").find_files({
     prompt_title = "Notes",
     cwd = opts.notes_path,
-    find_command = { "fd", "-d", "1", "--extension", opts.notes_format },
+    find_command = function()
+      if opts.find_recursively == true then
+        opts.find_recursively = {}
+      else
+        opts.find_recursively = { "-d", "1" }
+      end
+      return { "fd", "--extension", opts.notes_format, unpack(opts.find_recursively) }
+    end,
     attach_mappings = function(prompt_bufnr, map)
       map({ "i", "n" }, "<CR>", function()
         open_note(prompt_bufnr, opts)
