@@ -15,6 +15,7 @@ notes.
 ### Using Lazy
 
 Add the following to your `init.lua`
+
 ```lua
 {
   "omarcospo/dumbnotes.nvim",
@@ -46,6 +47,7 @@ Add the following setup code to your `init.lua` or `init.vim`:
 require('dumbnotes').setup({
   notes_format = "md", -- Format of the notes
   notes_path = "~/Notes", -- Path to the notes directory
+  find_recursively = false, -- Find notes recursively in path
   mappings = {
     new_note_key = "<C-n>", -- Keybinding to create a new note
     delete_note_key = "<C-d>", -- Keybinding to delete a note
