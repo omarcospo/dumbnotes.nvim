@@ -82,7 +82,7 @@ function dumbnotes.list_notes(opts)
     prompt_title = "Notes",
     cwd = opts.notes_path,
     find_command = function()
-      return { "fd", "--extension", opts.notes_format, opts.find_recursively and "" or "-d 1" }
+      return { "fd", "--extension", opts.notes_format, unpack(opts.find_recursively and {} or { "-d", "1" }) }
     end,
     attach_mappings = function(prompt_bufnr, map)
       map({ "i", "n" }, "<CR>", function()
