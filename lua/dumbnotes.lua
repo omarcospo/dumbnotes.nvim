@@ -22,27 +22,33 @@ dumbnotes.setup = function(user_opts)
   end, {})
 end
 
-function dumbnotes.list_notes(opts)
-  local actions = require("telescope.actions")
-  local action_state = require("telescope.actions.state")
+local actions = require("telescope.actions")
+local action_state = require("telescope.actions.state")
 
-  local function open(input, ext, opts)
-    if input or input ~= "" then
-      local path = vim.fn.expand(opts.notes_path .. "/" .. input .. (ext and ("." .. opts.notes_format) or ""))
-      if ext or vim.fn.filereadable(path) == 1 then
-        vim.cmd("edit " .. vim.fn.fnameescape(path))
-      else
-        print("Invalid note: " .. path)
-      end
+local function open(input, ext, opts)
+  if input or input ~= "" then
+    local path = vim.fn.expand(opts.notes_path .. "/" .. input .. (ext and ("." .. opts.notes_format) or ""))
+    if ext or vim.fn.filereadable(path) == 1 then
+      vim.cmd("edit " .. vim.fn.fnameescape(path))
     else
-      print("Invalid note.")
+      print("Invalid note: " .. path)
     end
+  else
+    print("Invalid note.")
   end
+end
 
+function dumbnotes.list_notes(opts)
   local function open_note(prompt_bufnr, opts)
     local selection = action_state.get_selected_entry()
+    local current_picker = action_state.get_current_picker(prompt_bufnr)
+    local input = current_picker:_get_prompt()
     actions.close(prompt_bufnr)
-    open(selection.value, false, opts)
+    if selection then
+      open(selection.value, false, opts)
+    else
+      open(input, true, opts)
+    end
   end
 
   local function delete_note(prompt_bufnr, opts)
