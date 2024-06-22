@@ -27,18 +27,12 @@ function dumbnotes.list_notes(opts)
   local action_state = require("telescope.actions.state")
 
   local function open(input, ext, opts)
-    local path
-    if input == true or input ~= "" then
-      if ext then
-        path = vim.fn.expand(opts.notes_path .. "/" .. input .. "." .. opts.notes_format)
+    if input or input ~= "" then
+      local path = vim.fn.expand(opts.notes_path .. "/" .. input .. (ext and ("." .. opts.notes_format) or ""))
+      if ext or vim.fn.filereadable(path) == 1 then
         vim.cmd("edit " .. vim.fn.fnameescape(path))
       else
-        path = vim.fn.expand(opts.notes_path .. "/" .. input)
-        if vim.fn.filereadable(path) == 1 then
-          vim.cmd("edit " .. vim.fn.fnameescape(path))
-        else
-          print("Invalid note: " .. path)
-        end
+        print("Invalid note: " .. path)
       end
     else
       print("Invalid note.")
@@ -48,21 +42,21 @@ function dumbnotes.list_notes(opts)
   local function open_note(prompt_bufnr, opts)
     local selection = action_state.get_selected_entry()
     actions.close(prompt_bufnr)
-    open(selection[1], false, opts)
+    open(selection.value, false, opts)
   end
 
   local function delete_note(prompt_bufnr, opts)
     local selection = action_state.get_selected_entry()
-    local file_path = vim.fn.expand(opts.notes_path .. "/" .. selection[1])
+    local file_path = vim.fn.expand(opts.notes_path .. "/" .. selection.value)
     actions.close(prompt_bufnr)
     if vim.fn.filereadable(file_path) == 1 then
       local confirm = vim.fn.confirm("Delete note: " .. file_path .. "?", "&Yes\n&No")
       if confirm == 1 then
         local ok, err = os.remove(file_path)
-        if not ok then
-          print("Error deleting note: " .. err)
-        else
+        if ok then
           print("Deleted note: " .. file_path)
+        else
+          print("Error deleting note: " .. err)
         end
       else
         print("Deletion cancelled.")
@@ -77,10 +71,10 @@ function dumbnotes.list_notes(opts)
     local ok, input = pcall(function()
       return vim.fn.input({ prompt = "Note title: " })
     end)
-    if ok then
+    if ok and input ~= "" then
       open(input, true, opts)
     else
-      print("Error creating note: " .. input)
+      print("Error creating note: " .. (input or "Invalid input"))
     end
   end
 
